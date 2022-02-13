@@ -54,6 +54,17 @@ class Eye {
       if (eye != this) other = eye;
     });
 
+    if (
+      Math.sqrt((this.x - other.x) ** 2 + (this.y - other.y) ** 2) <
+      EYE_RADIUS * 2
+    ) {
+      const total_speed =
+        Math.sqrt(this.vx ** 2 + this.vy ** 2) +
+        Math.sqrt(other.vx ** 2 + other.vy ** 2);
+      const dx = this.x - other.x;
+      const dy = this.y - other.y;
+    }
+
     const x_dis_from_center = Math.abs(SIZE / 2 - this.x);
     const y_dis_from_center = Math.abs(SIZE / 2 - this.y);
     if (
@@ -62,12 +73,9 @@ class Eye {
     ) {
       const speed = Math.sqrt(this.vx ** 2 + this.vy ** 2);
 
-      // used to calculate the angle new launch angle
-      const unit_x = x_dis_from_center / (SIZE / 2);
-      const unit_y = y_dis_from_center / (SIZE / 2);
-
-      // calculate the angle, and add a little randomness to make it more fun
-      const angle = Math.atan(unit_y / unit_x) + Math.random() - 0.5;
+      // calculate the new launch angle, and add a little randomness to make it more fun
+      const angle =
+        Math.atan(y_dis_from_center / x_dis_from_center) + Math.random() - 0.5;
 
       const x_in_dir = this.x > SIZE / 2 ? -1 : 1;
       const y_in_dir = this.y > SIZE / 2 ? -1 : 1;
