@@ -56,14 +56,23 @@ class Eye {
 
     if (
       Math.sqrt((this.x - other.x) ** 2 + (this.y - other.y) ** 2) <
-      EYE_RADIUS * 2
+        EYE_RADIUS * 2 &&
+      !this.bounced
     ) {
       const total_speed =
         Math.sqrt(this.vx ** 2 + this.vy ** 2) +
         Math.sqrt(other.vx ** 2 + other.vy ** 2);
       const dx = this.x - other.x;
       const dy = this.y - other.y;
+      const h = Math.sqrt(dy ** 2 + dx ** 2);
+      this.vx = ((total_speed / 2) * dx) / h;
+      this.vy = ((total_speed / 2) * dy) / h;
+      other.vx = (-1 * (total_speed / 2) * dx) / h;
+      other.vy = (-1 * (total_speed / 2) * dy) / h;
+      other.bounced = true;
+      this.bounced = true;
     }
+    this.bounced = false;
 
     const x_dis_from_center = Math.abs(SIZE / 2 - this.x);
     const y_dis_from_center = Math.abs(SIZE / 2 - this.y);
@@ -86,22 +95,8 @@ class Eye {
   }
 }
 
-let left_eye = new Eye(
-  126,
-  248,
-  Math.random() * 2 - 1,
-  Math.random() * 2 - 1,
-  Math.random() / 100,
-  Math.random() / 100
-);
-let right_eye = new Eye(
-  369,
-  256,
-  Math.random() * 2 - 1,
-  Math.random() * 2 - 1,
-  Math.random() / 1000,
-  Math.random() / 1000
-);
+let left_eye = new Eye(126, 248, 2, 0, 0, 0);
+let right_eye = new Eye(369, 256, 0, 0, 0, 0);
 
 const draw_circle = (x, y, r, color) => {
   ctx.beginPath();
