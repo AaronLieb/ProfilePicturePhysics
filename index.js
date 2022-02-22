@@ -3,6 +3,7 @@ const green = "#44FF5F";
 
 const SIZE = 500;
 const EYE_RADIUS = 45;
+const MOUTH_RADIUS = 45;
 
 let canvas;
 let ctx;
@@ -63,6 +64,8 @@ class Eye extends Thing {
   }
 
   move() {
+    super.move();
+
     // ball collisions
     let other;
     eyes.forEach((eye) => {
@@ -114,6 +117,7 @@ class Eye extends Thing {
         MOUTH_RADIUS * 2 &&
       !this.bounced
     ) {
+      console.log("mouth bounce");
       const speed = Math.sqrt(this.vx ** 2 + this.vy ** 2);
       const dx = this.x - mouth.x;
       const dy = this.y - mouth.y;
@@ -130,14 +134,39 @@ class Eye extends Thing {
 class Mouth extends Thing {
   constructor(x, y, vx = 0, vy = 0, ax = 0, ay = 0) {
     super(x, y, vx, vy, ax, ay);
+    this.leftX = this.x - 37.105;
+    this.leftY = this.y - 1.955;
+    this.rightX = this.x + 37.105;
+    this.rightY = this.y + 1.955;
+    this.leftCX = this.leftX - 9.77;
+    this.leftCY = this.leftY + 50.79;
+    this.rightCX = this.rightX - 5.85;
+    this.rightCY = this.rightY + 54.59;
   }
 
-  draw() {}
+  draw() {
+    draw_smile(228.52, 308.59, 302.73, 312.5, 218.75, 359.38, 296.88, 367.19);
+    ctx.beginPath();
+    ctx.moveTo(this.leftX, this.leftY);
+    ctx.bezierCurveTo(
+      this.leftCX,
+      this.leftCY,
+      this.rightCX,
+      this.rightCY,
+      this.rightX,
+      this.rightY
+    );
+    ctx.strokeStyle = green;
+    ctx.lineWidth = "33";
+    ctx.stroke();
+    draw_circle(this.leftX, this.leftY, 15.9);
+    draw_circle(this.rightX, this.rightY, 15.9);
+  }
 }
 
 let left_eye = new Eye(126, 248, 2, 0, 0, 0);
 let right_eye = new Eye(369, 256, 0, 0, 0, 0);
-let mouth = new Mouth();
+let mouth = new Mouth(265.625, 310.545);
 
 const draw_circle = (x, y, r, color) => {
   ctx.beginPath();
@@ -149,16 +178,7 @@ const draw_circle = (x, y, r, color) => {
   ctx.stroke();
 };
 
-const draw_smile = (x1, y1, x2, y2, cpx1, cpy1, cpx2, cpy2) => {
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.bezierCurveTo(cpx1, cpy1, cpx2, cpy2, x2, y2);
-  ctx.strokeStyle = green;
-  ctx.lineWidth = "33";
-  ctx.stroke();
-  draw_circle(x1, y1, 15.9);
-  draw_circle(x2, y2, 15.9);
-};
+const draw_smile = (x1, y1, x2, y2, cpx1, cpy1, cpx2, cpy2) => {};
 
 const draw_background = () => {
   ctx.beginPath();
@@ -176,7 +196,6 @@ const draw = () => {
   draw_background();
   eyes.forEach((eye) => eye.draw());
   mouth.draw();
-  draw_smile(228.52, 308.59, 302.73, 312.5, 218.75, 359.38, 296.88, 367.19);
 };
 
 const loop = () => {
