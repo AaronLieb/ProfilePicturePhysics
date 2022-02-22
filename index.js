@@ -13,7 +13,7 @@ const dir = (a) => {
   return a >= 0 ? 1 : -1;
 };
 
-class Eye {
+class Thing {
   constructor(x, y, vx = 0, vy = 0, ax = 0, ay = 0) {
     this.x = x;
     this.y = y;
@@ -25,7 +25,6 @@ class Eye {
     this.y_dir = dir(vy);
     this.bounced = false;
     this.updateBox();
-    eyes.push(this);
   }
 
   updateBox() {
@@ -33,10 +32,6 @@ class Eye {
     this.right = this.x + EYE_RADIUS;
     this.top = this.y - EYE_RADIUS;
     this.bottom = this.y + EYE_RADIUS;
-  }
-
-  draw() {
-    draw_circle(this.x, this.y, EYE_RADIUS, green);
   }
 
   move() {
@@ -47,8 +42,28 @@ class Eye {
     this.x_dir = dir(this.vx);
     this.y_dir = dir(this.vy);
     this.updateBox();
+  }
 
-    // collisions
+  draw() {
+    return;
+  }
+}
+
+// Mouth
+// 228.52, 308.59, 302.73, 312.5, 218.75, 359.38, 296.88, 367.19
+
+class Eye extends Thing {
+  constructor(x, y, vx = 0, vy = 0, ax = 0, ay = 0) {
+    super(x, y, vx, vy, ax, ay);
+    eyes.push(this);
+  }
+
+  draw() {
+    draw_circle(this.x, this.y, EYE_RADIUS, green);
+  }
+
+  move() {
+    // ball collisions
     let other;
     eyes.forEach((eye) => {
       if (eye != this) other = eye;
@@ -72,8 +87,8 @@ class Eye {
       other.bounced = true;
       this.bounced = true;
     }
-    this.bounced = false;
 
+    // wall collisions
     const x_dis_from_center = Math.abs(SIZE / 2 - this.x);
     const y_dis_from_center = Math.abs(SIZE / 2 - this.y);
     if (
@@ -92,11 +107,37 @@ class Eye {
       this.vx = x_in_dir * speed * Math.cos(angle);
       this.vy = y_in_dir * speed * Math.sin(angle);
     }
+
+    // mouth collisions
+    if (
+      Math.sqrt((this.x - mouth.x) ** 2 + (this.y - mouth.y) ** 2) <
+        MOUTH_RADIUS * 2 &&
+      !this.bounced
+    ) {
+      const speed = Math.sqrt(this.vx ** 2 + this.vy ** 2);
+      const dx = this.x - mouth.x;
+      const dy = this.y - mouth.y;
+      const h = Math.sqrt(dy ** 2 + dx ** 2);
+      this.vx = (speed * dx) / h;
+      this.vy = (speed * dy) / h;
+      this.bounced = true;
+    }
+
+    this.bounced = false;
   }
+}
+
+class Mouth extends Thing {
+  constructor(x, y, vx = 0, vy = 0, ax = 0, ay = 0) {
+    super(x, y, vx, vy, ax, ay);
+  }
+
+  draw() {}
 }
 
 let left_eye = new Eye(126, 248, 2, 0, 0, 0);
 let right_eye = new Eye(369, 256, 0, 0, 0, 0);
+let mouth = new Mouth();
 
 const draw_circle = (x, y, r, color) => {
   ctx.beginPath();
@@ -134,6 +175,7 @@ const move = () => {
 const draw = () => {
   draw_background();
   eyes.forEach((eye) => eye.draw());
+  mouth.draw();
   draw_smile(228.52, 308.59, 302.73, 312.5, 218.75, 359.38, 296.88, 367.19);
 };
 
